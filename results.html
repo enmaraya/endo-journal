@@ -1,0 +1,307 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#a9573c">
+<title>יומן אנדו — תובנות</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Assistant:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#f5f2ec; --card:#fff; --line:#e3ddd2; --line2:#cfc8b8;
+    --ink:#26221c; --ink2:#6b6459; --mut:#a39c8c;
+    --accent:#a9573c; --accent-d:#7f3f2a; --accent-tint:#f0e3dc;
+    --ease:cubic-bezier(.2,.7,.2,1);
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0}
+  body{font-family:'Assistant',system-ui,-apple-system,sans-serif; background:var(--bg); color:var(--ink); line-height:1.5; -webkit-text-size-adjust:100%}
+  .wrap{max-width:460px; margin:0 auto; padding:20px 16px 44px; display:flex; flex-direction:column; gap:14px}
+  @keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+  .wrap>*{animation:fadeUp .42s var(--ease) both}
+  .wrap>*:nth-child(2){animation-delay:.05s}.wrap>*:nth-child(3){animation-delay:.1s}
+  .wrap>*:nth-child(4){animation-delay:.15s}.wrap>*:nth-child(5){animation-delay:.2s}
+  .wrap>*:nth-child(6){animation-delay:.25s}.wrap>*:nth-child(7){animation-delay:.3s}
+  h1{font-size:20px;font-weight:700;margin:0}
+  .sub{font-size:12.5px;color:var(--ink2)}
+  section{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;display:flex;flex-direction:column;gap:12px}
+  .sec-h{font-size:15px;font-weight:700}
+  .sec-sub{font-size:12px;color:var(--mut)}
+  .banner{background:var(--accent-tint);border:1px solid #e2cdc2;border-radius:12px;padding:14px 15px;font-size:13.5px;color:var(--accent-d)}
+  .tiles{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+  .tile{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:13px;display:flex;flex-direction:column;gap:5px}
+  .tile .t-lab{font-size:12px;color:var(--ink2)}
+  .tile .t-val{font-size:23px;font-weight:700}
+  .tile .t-delta{font-size:11.5px;color:var(--ink2);display:flex;align-items:center;gap:3px}
+  .grid7{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:5px}
+  .grid7 .cell{aspect-ratio:1;border-radius:5px;background:#efe9dd}
+  .grid7 .cell.none{background:transparent;border:1px dashed var(--line2)}
+  .wk{display:flex;font-size:10px;color:var(--mut);gap:5px}.wk span{flex:1;text-align:center}
+  .sig{border:1px solid var(--line);border-radius:11px;padding:12px;display:flex;flex-direction:column;gap:7px}
+  .sig-top{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
+  .sig-txt{font-size:13.5px;font-weight:600}
+  .dots{display:flex;gap:3px;flex:none;margin-top:3px}
+  .dots i{width:7px;height:7px;border-radius:999px;background:var(--line2)}
+  .dots i.on{background:var(--accent)}
+  .sig-act{font-size:12px;color:var(--ink2)}
+  .line{font-size:13px;color:var(--ink2)}
+  .foot{text-align:center;font-size:11px;color:var(--mut);display:flex;flex-direction:column;gap:6px}
+  a{color:var(--accent)}a:hover{color:var(--accent-d)}
+  .gate{min-height:72vh;display:flex;flex-direction:column;justify-content:center;gap:14px;max-width:340px;margin:0 auto;padding:24px 16px;animation:fadeUp .42s var(--ease) both}
+  .gate h1{font-size:19px}
+  .gate p{font-size:13px;color:var(--ink2);margin:0}
+  .gate input{font:inherit;font-size:16px;padding:13px 14px;border:1px solid var(--line2);border-radius:10px;background:#fff;width:100%}
+  .gate input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-tint)}
+  .gate button{font:inherit;font-size:16px;font-weight:700;min-height:50px;border:0;border-radius:11px;background:var(--accent);color:#fff;cursor:pointer}
+  .gate button:disabled{opacity:.55}
+  .gate .msg{font-size:13px;min-height:18px}
+  .gate .msg.err{color:var(--accent-d)}
+  .gate .link{font-size:13px;color:var(--accent);cursor:pointer;text-align:center}
+  svg{display:block}
+  @media (prefers-reduced-motion:reduce){*{animation-duration:.01ms!important;transition-duration:.01ms!important}}
+</style>
+</head>
+<body>
+
+<div id="loading" class="wrap"><section><div class="line">טוען…</div></section></div>
+
+<!-- step 1: email -->
+<div id="gateEmail" class="gate" hidden>
+  <div><h1>התובנות שלך</h1><p style="margin-top:5px">הזיני את כתובת המייל שלך כדי להיכנס.</p></div>
+  <input id="email" type="email" inputmode="email" autocomplete="email" placeholder="כתובת מייל" enterkeyhint="go">
+  <div class="msg" id="emailMsg"></div>
+  <button id="emailBtn">שלחו לי קוד</button>
+</div>
+
+<!-- step 2: code -->
+<div id="gateCode" class="gate" hidden>
+  <div><h1>הזיני את הקוד</h1><p style="margin-top:5px" id="codeSub"></p></div>
+  <input id="code" type="text" inputmode="numeric" autocomplete="one-time-code" maxlength="6" placeholder="קוד בן 6 ספרות" enterkeyhint="go">
+  <div class="msg" id="codeMsg"></div>
+  <button id="codeBtn">כניסה</button>
+  <div class="link" id="backLink">‹ מייל אחר</div>
+</div>
+
+<!-- denied -->
+<div id="denied" class="gate" hidden>
+  <div><h1>אין הרשאה</h1><p style="margin-top:5px">המשתמש הזה לא מורשה לצפות בתובנות.</p></div>
+  <button id="denyOut">התנתקות</button>
+</div>
+
+<div id="app" class="wrap" hidden></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+const SUPA_URL = 'https://wdlemmrdafvypbzgfvkx.supabase.co';
+const SUPA_KEY = 'sb_publishable_MeP8AVZnlEMWZCW29lsnvw_urLdPl_P';
+const $ = s => document.querySelector(s);
+const show = id => { for (const el of document.querySelectorAll('#loading,#gateEmail,#gateCode,#denied,#app')) el.hidden = (el.id !== id); };
+
+const sb = window.supabase.createClient(SUPA_URL, SUPA_KEY, { auth:{ persistSession:true, autoRefreshToken:true, detectSessionInUrl:false } });
+let emailUsed = '';
+
+async function boot(){
+  const { data:{ session } } = await sb.auth.getSession();
+  if (session) return afterLogin();
+  show('gateEmail'); $('#email').focus();
+}
+
+// step 1
+$('#emailBtn').addEventListener('click', sendCode);
+$('#email').addEventListener('keydown', e=>{ if(e.key==='Enter') sendCode(); });
+async function sendCode(){
+  const email = $('#email').value.trim().toLowerCase();
+  if(!email || !email.includes('@')){ msg('#emailMsg','כתובת מייל לא תקינה',true); return; }
+  $('#emailBtn').disabled = true; msg('#emailMsg','שולח…');
+  const { error } = await sb.auth.signInWithOtp({ email, options:{ shouldCreateUser:true } });
+  $('#emailBtn').disabled = false;
+  if(error){ msg('#emailMsg', error.message || 'שגיאה בשליחה', true); return; }
+  emailUsed = email;
+  $('#codeSub').textContent = `שלחנו קוד ל-${email}. בדקי גם בספאם.`;
+  msg('#emailMsg','');
+  show('gateCode'); $('#code').focus();
+}
+
+// step 2
+$('#codeBtn').addEventListener('click', verify);
+$('#code').addEventListener('keydown', e=>{ if(e.key==='Enter') verify(); });
+$('#backLink').addEventListener('click', ()=>{ show('gateEmail'); $('#email').focus(); });
+async function verify(){
+  const token = $('#code').value.trim();
+  if(token.length < 6){ msg('#codeMsg','קוד בן 6 ספרות',true); return; }
+  $('#codeBtn').disabled = true; msg('#codeMsg','בודק…');
+  const { data, error } = await sb.auth.verifyOtp({ email: emailUsed, token, type:'email' });
+  $('#codeBtn').disabled = false;
+  if(error || !data.session){ msg('#codeMsg','קוד שגוי או שפג תוקפו', true); return; }
+  msg('#codeMsg','');
+  afterLogin();
+}
+function msg(sel,text,isErr){ const e=$(sel); e.textContent=text; e.className='msg'+(isErr?' err':''); }
+
+$('#denyOut').addEventListener('click', async ()=>{ await sb.auth.signOut(); location.reload(); });
+
+async function afterLogin(){
+  show('loading');
+  const { data } = await sb.from('analysis_results').select('payload').eq('id','current').maybeSingle();
+  if (data && data.payload){ render(data.payload); return; }
+  // אין שורה נראית: או אין הרשאה, או שהדוח עדיין לא נוצר
+  show('denied');
+  $('#denied').querySelector('p').textContent = 'או שאין הרשאה למשתמש הזה, או שהדוח עדיין לא נוצר (נוצר אחרי שבוע הראשון של רישום).';
+}
+
+// ---------- render ----------
+const heMon = ['ינו׳','פבר׳','מרץ','אפר׳','מאי','יוני','יולי','אוג׳','ספט׳','אוק׳','נוב׳','דצמ׳'];
+const fmt = iso => { const d=new Date(iso+'T12:00'); return `${d.getDate()} ב${heMon[d.getMonth()]}`; };
+const el = (tag, cls, html) => { const e=document.createElement(tag); if(cls)e.className=cls; if(html!=null)e.innerHTML=html; return e; };
+const arrow = d => d==null||Math.abs(d)<0.05 ? '' :
+  `<svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.6">${d>0?'<path d="M5 8V2M2.5 4.5 5 2l2.5 2.5"/>':'<path d="M5 2v6M2.5 5.5 5 8l2.5-2.5"/>'}</svg>`;
+
+function spark(vals){
+  const v = vals.map(x=> x==null?null:x);
+  const nums = v.filter(x=>x!=null);
+  if(nums.length<2) return '';
+  const mn=Math.min(...nums), mx=Math.max(...nums), rng=(mx-mn)||1;
+  const n=v.length, W=100, H=26;
+  let d='', started=false;
+  v.forEach((x,i)=>{
+    if(x==null){ started=false; return; }
+    const px = n===1?W:(i/(n-1))*W;
+    const py = H-2 - ((x-mn)/rng)*(H-4);
+    d += (started?' L':' M') + px.toFixed(1)+' '+py.toFixed(1);
+    started=true;
+  });
+  return `<svg width="100%" height="24" viewBox="0 0 ${W} ${H}" preserveAspectRatio="none"><path d="${d}" fill="none" stroke="#a39c8c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+}
+function hue(v, scale){
+  if(v==null) return null;
+  const t = Math.max(0, Math.min(1, v/scale));
+  const l=(a,b)=>Math.round(a+(b-a)*t);
+  return `rgb(${l(239,169)},${l(233,87)},${l(221,60)})`;
+}
+function trendChart(tr){
+  if(!tr) return '';
+  const W=320,H=130,pad=6;
+  const series = [['pain_ma7','#a9573c'],['fatigue_ma7','#8c8577']];
+  let all=[]; series.forEach(([k])=> all=all.concat((tr[k]||[]).filter(x=>x!=null)));
+  if(all.length<3) return '';
+  const mx=Math.max(...all,1), n=tr.days.length;
+  let paths='';
+  for(const [k,col] of series){
+    let d='',started=false;
+    (tr[k]||[]).forEach((x,i)=>{
+      if(x==null){started=false;return;}
+      const px=pad+(i/(n-1))*(W-2*pad);
+      const py=H-pad-(x/mx)*(H-2*pad);
+      d+=(started?' L':' M')+px.toFixed(1)+' '+py.toFixed(1); started=true;
+    });
+    paths+=`<path d="${d}" fill="none" stroke="${col}" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>`;
+  }
+  return `<svg width="100%" viewBox="0 0 ${W} ${H}">${paths}</svg>
+   <div class="wk" style="justify-content:space-between"><span style="text-align:start">${fmt(tr.days[0])}</span><span style="text-align:end">${fmt(tr.days[n-1])}</span></div>
+   <div style="display:flex;gap:14px;font-size:11px;color:var(--ink2)">
+     <span style="display:flex;align-items:center;gap:5px"><i style="width:14px;height:3px;background:#a9573c;border-radius:2px"></i>כאב</span>
+     <span style="display:flex;align-items:center;gap:5px"><i style="width:14px;height:3px;background:#8c8577;border-radius:2px"></i>עייפות</span>
+   </div>`;
+}
+
+function render(R){
+  show('app');
+  const app = $('#app'); app.innerHTML = '';
+
+  const h = el('div');
+  h.append(el('h1', null, 'התובנות שלך'));
+  const wk = R.week ? `${fmt(R.week.from)}–${fmt(R.week.to)}` : '';
+  h.append(el('div','sub', `${wk} · שלב ${R.phase} · ${R.phase_label} · ${R.totals.days_logged} ימי רישום`));
+  app.append(h);
+
+  if(R.state_note) app.append(el('div','banner', R.state_note));
+
+  if(R.tiles && R.tiles.length){
+    const s = el('section');
+    s.append(el('div','sec-h','השבוע' + (R.state!=='collecting' ? ' מול הרגיל שלך' : '')));
+    const g = el('div','tiles');
+    for(const t of R.tiles){
+      const c = el('div','tile');
+      c.append(el('div','t-lab', t.label));
+      c.append(el('div','t-val', t.value==null ? '—' : t.value));
+      if(t.delta!=null) c.append(el('div','t-delta', `${arrow(t.delta)} ${t.delta>0?'גבוה':'נמוך'} ב-${Math.abs(t.delta)} מהרגיל (${t.baseline})`));
+      else if(t.baseline!=null) c.append(el('div','t-delta','כמו הרגיל'));
+      const sp = spark(t.spark||[]); if(sp) c.append(el('div',null,sp));
+      g.append(c);
+    }
+    s.append(g); app.append(s);
+  }
+
+  if(R.heatmap){
+    const s = el('section');
+    s.append(el('div','sec-h','מפת החודש · עוצמת כאב'));
+    s.append(el('div','sec-sub','כהה = כאב חזק יותר · מקווקו = יום שלא נרשם'));
+    s.append(el('div','wk','<span>א</span><span>ב</span><span>ג</span><span>ד</span><span>ה</span><span>ו</span><span>ש</span>'));
+    const g = el('div','grid7');
+    for(let i=0;i<R.heatmap.weekday_first;i++) g.append(el('span'));
+    for(const cell of R.heatmap.cells){
+      const c = el('span', 'cell' + (cell.logged ? '' : ' none'));
+      const col = hue(cell.v, 10); if(col) c.style.background = col;
+      g.append(c);
+    }
+    s.append(g); app.append(s);
+  }
+
+  const tc = trendChart(R.trend);
+  if(tc){
+    const s = el('section');
+    s.append(el('div','sec-h','מגמה · ממוצע נע 7 ימים'));
+    s.append(el('div', null, tc));
+    app.append(s);
+  }
+
+  {
+    const s = el('section');
+    s.append(el('div','sec-h','אותות לבדיקה'));
+    if(R.signals && R.signals.length){
+      for(const sg of R.signals){
+        const c = el('div','sig');
+        const top = el('div','sig-top');
+        top.append(el('div','sig-txt', sg.text));
+        let dots=''; for(let i=1;i<=3;i++) dots+=`<i class="${i<=sg.confidence?'on':''}"></i>`;
+        top.append(el('div','dots', dots));
+        c.append(top);
+        c.append(el('div','sig-act', sg.action));
+        s.append(c);
+      }
+      s.append(el('div','sec-sub','ודאות: ●●● חזר ואומת · ●● אפשרי · ● מתחיל'));
+    } else {
+      s.append(el('div','line', R.signals_note || 'אין אותות כרגע.'));
+    }
+    app.append(s);
+  }
+
+  {
+    const s = el('section');
+    s.append(el('div','sec-h','מחזוריות'));
+    s.append(el('div','line', (R.periodicity && R.periodicity.text) || ''));
+    app.append(s);
+  }
+  {
+    const c = R.totals;
+    const s = el('section');
+    s.append(el('div','line', `רשמת ${c.days_logged} מתוך ${c.span_days} הימים בשלב הזה (${c.completeness_pct}%).`));
+    s.append(el('div','sec-sub', R.reflection));
+    app.append(s);
+  }
+
+  const f = el('div','foot',
+    `עודכן: ${fmt(R.generated_at.slice(0,10))} · מתעדכן פעם בשבוע<br><a href="./">← חזרה לרישום היומי</a>`);
+  const out = el('span','link','התנתקות');
+  out.style.marginTop = '4px';
+  out.addEventListener('click', async ()=>{ await sb.auth.signOut(); location.reload(); });
+  f.append(out);
+  app.append(f);
+}
+
+boot();
+</script>
+</body>
+</html>

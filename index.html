@@ -254,6 +254,24 @@
         <button type="button" data-v="חריגה">חריגה</button>
       </div>
     </div>
+
+    <div class="field">
+      <span class="label">אלכוהול היום</span>
+      <div class="seg" id="alcohol">
+        <button type="button" data-v="אין">אין</button>
+        <button type="button" data-v="כוס אחת">כוס אחת</button>
+        <button type="button" data-v="2+">2+</button>
+      </div>
+    </div>
+
+    <div class="field">
+      <span class="label">קפאין היום (קפה / תה / קולה)</span>
+      <div class="seg" id="caffeine">
+        <button type="button" data-v="אין">אין</button>
+        <button type="button" data-v="1-2">1–2</button>
+        <button type="button" data-v="3+">3+</button>
+      </div>
+    </div>
   </section>
 
   <!-- DETAIL -->
@@ -306,6 +324,7 @@
 
   <button class="save" id="saveBtn">שמירת היום</button>
   <div class="hint">הליבה מספיקה לניתוח. הפירוט משפר דיוק אבל לא חובה.</div>
+  <div style="text-align:center; padding-top:4px"><a href="results.html" style="font-size:13.5px; font-weight:600">התובנות שלי ←</a></div>
   <div id="toast" class="toast" hidden></div>
 
 </div>
@@ -407,6 +426,8 @@ function collect(){
     painkiller: pk===null ? null : (pk==='true'),
     painkiller_note: $('#painkiller_note').value.trim() || null,
     diet_adherence: getSeg('diet_adherence'),
+    alcohol: getSeg('alcohol'),
+    caffeine: getSeg('caffeine'),
     gi_bloating: $('#gi_bloating')._touched ? +$('#gi_bloating').value : null,
     gi_bm_pain: $('#gi_bm_pain')._touched ? +$('#gi_bm_pain').value : null,
     gi_stool: $('#gi_stool').value || null,
@@ -441,6 +462,7 @@ function loadDraft(){
   if(d.sleep_hours!=null){ $('#sleep_hours').value=d.sleep_hours; $('#sleep_hours_n').textContent=(+d.sleep_hours).toFixed(1); }
   applyChips('pain_location', d.pain_location); applyChips('pain_character', d.pain_character); applyChips('context_flags', d.context_flags);
   applySeg('bleeding', d.bleeding); applySeg('diet_adherence', d.diet_adherence);
+  applySeg('alcohol', d.alcohol); applySeg('caffeine', d.caffeine);
   applySeg('painkiller', d.painkiller==null?null:String(d.painkiller));
   if(d.sleep_quality){ const ev=new Event('click'); $('#sleep_quality span[data-v="'+d.sleep_quality+'"]').dispatchEvent(ev); }
   $('#painkiller_note').value = d.painkiller_note||''; $('#activity').value = d.activity||'';
