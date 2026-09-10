@@ -1,0 +1,466 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#a9573c">
+<title>יומן אנדו — רישום יומי</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Assistant:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#f5f2ec; --card:#ffffff; --line:#e3ddd2; --line2:#cfc8b8;
+    --ink:#26221c; --ink2:#6b6459; --mut:#a39c8c;
+    --accent:#a9573c; --accent-d:#7f3f2a; --accent-tint:#f0e3dc;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0}
+  body{
+    font-family:'Assistant',system-ui,-apple-system,sans-serif;
+    background:var(--bg); color:var(--ink); line-height:1.45;
+    -webkit-text-size-adjust:100%;
+  }
+  .wrap{max-width:440px; margin:0 auto; padding:18px 16px 40px; display:flex; flex-direction:column; gap:14px}
+  header{display:flex; flex-direction:column; gap:10px}
+  .row{display:flex; justify-content:space-between; align-items:center; gap:10px}
+  h1{font-size:19px; font-weight:700; margin:0}
+  .sub{font-size:12px; color:var(--ink2)}
+  .phase{font-size:12px; color:var(--ink2); border:1px solid var(--line2); border-radius:999px; padding:6px 12px; background:#fff}
+  input[type=date]{font:inherit; border:1px solid var(--line2); border-radius:8px; padding:8px 10px; background:#fff; color:var(--ink)}
+
+  section{background:var(--card); border:1px solid var(--line); border-radius:14px; padding:16px; display:flex; flex-direction:column; gap:18px}
+  .sec-title{font-size:16px; font-weight:700}
+  .field{display:flex; flex-direction:column; gap:8px}
+  .label{font-size:14.5px; font-weight:600}
+  .lab-row{display:flex; justify-content:space-between; align-items:baseline}
+  .val{font-size:22px; font-weight:700; color:var(--accent); min-width:2ch; text-align:left}
+  .val.small{font-size:15px; color:var(--ink2); font-weight:600}
+  .ends{display:flex; justify-content:space-between; font-size:11px; color:var(--mut)}
+
+  input[type=range]{
+    -webkit-appearance:none; appearance:none; width:100%; height:34px; background:transparent; margin:0; direction:rtl;
+  }
+  input[type=range]::-webkit-slider-runnable-track{height:8px; border-radius:999px; background:#e0dacd}
+  input[type=range]::-moz-range-track{height:8px; border-radius:999px; background:#e0dacd}
+  input[type=range]::-webkit-slider-thumb{-webkit-appearance:none; appearance:none; width:26px; height:26px; margin-top:-9px; border-radius:999px; background:#fff; border:3px solid var(--accent); cursor:pointer}
+  input[type=range]::-moz-range-thumb{width:22px; height:22px; border-radius:999px; background:#fff; border:3px solid var(--accent); cursor:pointer}
+
+  .chips{display:flex; flex-wrap:wrap; gap:8px}
+  .chip{padding:11px 15px; border:1px solid var(--line2); border-radius:999px; font-size:13px; background:#fff; color:var(--ink2); cursor:pointer; user-select:none; -webkit-tap-highlight-color:transparent}
+  .chip[aria-pressed="true"]{border:1.5px solid var(--accent); background:var(--accent-tint); color:var(--accent-d); font-weight:600}
+
+  .seg{display:flex; border:1px solid var(--line2); border-radius:9px; overflow:hidden}
+  .seg button{flex:1; border:0; border-inline-start:1px solid var(--line2); background:#fff; font:inherit; font-size:13px; padding:11px 4px; color:var(--ink); cursor:pointer}
+  .seg button:first-child{border-inline-start:0}
+  .seg button[aria-pressed="true"]{background:var(--accent); color:#fff; font-weight:600}
+
+  .stepper{display:flex; align-items:center; gap:14px}
+  .stepper button{width:40px; height:40px; border:1px solid var(--line2); border-radius:9px; background:#fff; font-size:20px; font:inherit; cursor:pointer}
+  .stepper .n{font-size:18px; font-weight:700; min-width:3ch; text-align:center}
+
+  .dots{display:flex; gap:9px}
+  .dots span{width:24px; height:24px; border-radius:999px; border:1px solid var(--line2); cursor:pointer}
+  .dots span[data-on="1"]{background:var(--accent); border-color:var(--accent)}
+
+  textarea,input[type=text],select{
+    font:inherit; width:100%; border:1px solid var(--line2); border-radius:9px; padding:11px 12px; background:#fff; color:var(--ink)
+  }
+  textarea{min-height:70px; resize:vertical}
+
+  details{background:var(--card); border:1px solid var(--line); border-radius:14px; overflow:hidden}
+  details>summary{list-style:none; padding:16px; font-size:15px; font-weight:700; cursor:pointer; display:flex; justify-content:space-between; align-items:center}
+  details>summary::-webkit-details-marker{display:none}
+  details>summary .caret{transition:transform .15s; color:var(--mut)}
+  details[open]>summary .caret{transform:rotate(180deg)}
+  .details-body{padding:0 16px 16px; display:flex; flex-direction:column; gap:18px}
+
+  .save{width:100%; min-height:54px; border:0; border-radius:12px; background:var(--accent); color:#fff; font:inherit; font-size:17px; font-weight:700; cursor:pointer}
+  .save:disabled{opacity:.55}
+  .hint{text-align:center; font-size:11px; color:var(--mut)}
+  .toast{position:sticky; bottom:10px; border-radius:12px; padding:13px 15px; font-size:14px; font-weight:600; text-align:center}
+  .toast.ok{background:#e5efe3; color:#2f6b3a; border:1px solid #c7e0c4}
+  .toast.err{background:#f6ece6; color:var(--accent-d); border:1px solid #e2cdc2}
+  .queue{font-size:12px; color:var(--ink2); background:#f0e3dc; border:1px solid #e2cdc2; border-radius:10px; padding:10px 12px; display:flex; justify-content:space-between; align-items:center; gap:10px}
+  .queue button{font:inherit; font-size:12px; font-weight:600; border:1px solid var(--accent); color:var(--accent-d); background:#fff; border-radius:8px; padding:7px 12px; cursor:pointer}
+  a{color:var(--accent)} a:hover{color:var(--accent-d)}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div class="row">
+      <div>
+        <h1>רישום יומי</h1>
+        <div class="sub" id="dayName">—</div>
+      </div>
+      <label class="phase">שלב
+        <select id="phase" style="border:0;background:transparent;padding:2px;font-weight:600;color:var(--ink)">
+          <option value="A">A · דיכוי מלא</option>
+          <option value="B">B · הפסקת הורמונים</option>
+          <option value="C">C · מחזור / הריון</option>
+          <option value="D">D · פרי-ניתוחי</option>
+          <option value="E">E · הריון</option>
+        </select>
+      </label>
+    </div>
+    <label class="field">
+      <span class="label">תאריך הרישום</span>
+      <input type="date" id="entry_date">
+    </label>
+  </header>
+
+  <div id="queueBox" class="queue" hidden>
+    <span id="queueMsg"></span>
+    <button type="button" id="retryBtn">שליחה חוזרת</button>
+  </div>
+
+  <!-- CORE -->
+  <section>
+    <div class="sec-title">הליבה · פחות מדקה</div>
+
+    <div class="field">
+      <div class="lab-row"><span class="label">כאב אגן — עכשיו</span><span class="val" id="v_pain">–</span></div>
+      <input type="range" min="0" max="10" step="1" id="pain_pelvic" value="0" data-out="v_pain">
+      <div class="ends"><span>אין כאב</span><span>הכי גרוע שאפשר</span></div>
+    </div>
+
+    <div class="field">
+      <span class="label">איפה הכאב?</span>
+      <div class="chips" data-multi id="pain_location">
+        <span class="chip" role="button" aria-pressed="false">אגן ימין</span>
+        <span class="chip" role="button" aria-pressed="false">אגן שמאל</span>
+        <span class="chip" role="button" aria-pressed="false">אגן תחתון / אמצע</span>
+        <span class="chip" role="button" aria-pressed="false">גב תחתון</span>
+        <span class="chip" role="button" aria-pressed="false">בטן</span>
+        <span class="chip" role="button" aria-pressed="false">אחר</span>
+      </div>
+    </div>
+
+    <div class="field">
+      <span class="label">אופי הכאב</span>
+      <div class="chips" data-multi id="pain_character">
+        <span class="chip" role="button" aria-pressed="false">התכווצות רחם</span>
+        <span class="chip" role="button" aria-pressed="false">דקירות</span>
+        <span class="chip" role="button" aria-pressed="false">צריבה</span>
+        <span class="chip" role="button" aria-pressed="false">עמום</span>
+        <span class="chip" role="button" aria-pressed="false">לחץ</span>
+      </div>
+    </div>
+
+    <div class="field">
+      <div class="lab-row"><span class="label">התכווצויות רחם — עוצמה</span><span class="val small" id="v_cramp">0 / 10</span></div>
+      <input type="range" min="0" max="10" step="1" id="uterine_cramp" value="0" data-out="v_cramp" data-suffix=" / 10">
+    </div>
+
+    <div class="field">
+      <div class="lab-row"><span class="label">עייפות</span><span class="val small" id="v_fatigue">0 / 10</span></div>
+      <input type="range" min="0" max="10" step="1" id="fatigue" value="0" data-out="v_fatigue" data-suffix=" / 10">
+    </div>
+    <div class="field">
+      <div class="lab-row"><span class="label">מצב רוח</span><span class="val small" id="v_mood">0 / 10</span></div>
+      <input type="range" min="0" max="10" step="1" id="mood" value="0" data-out="v_mood" data-suffix=" / 10">
+    </div>
+    <div class="field">
+      <div class="lab-row"><span class="label">מתח</span><span class="val small" id="v_stress">0 / 10</span></div>
+      <input type="range" min="0" max="10" step="1" id="stress" value="0" data-out="v_stress" data-suffix=" / 10">
+    </div>
+
+    <div class="field">
+      <span class="label">שעות שינה אתמול</span>
+      <div class="stepper">
+        <button type="button" data-step="-0.5" data-target="sleep_hours">–</button>
+        <span class="n" id="sleep_hours_n">7.0</span>
+        <button type="button" data-step="0.5" data-target="sleep_hours">+</button>
+        <input type="hidden" id="sleep_hours" value="7">
+      </div>
+    </div>
+    <div class="field">
+      <span class="label">איכות שינה</span>
+      <div class="dots" id="sleep_quality" data-scale="5">
+        <span data-v="1"></span><span data-v="2"></span><span data-v="3"></span><span data-v="4"></span><span data-v="5"></span>
+      </div>
+    </div>
+
+    <div class="field">
+      <span class="label">דימום / כתמום</span>
+      <div class="seg" id="bleeding">
+        <button type="button" data-v="אין">אין</button>
+        <button type="button" data-v="כתמום">כתמום</button>
+        <button type="button" data-v="קל">קל</button>
+        <button type="button" data-v="רגיל">רגיל</button>
+        <button type="button" data-v="כבד">כבד</button>
+      </div>
+    </div>
+
+    <div class="field">
+      <span class="label">משכך כאב / כרית חום / מנוחה מאולצת היום?</span>
+      <div class="seg" id="painkiller" style="max-width:200px">
+        <button type="button" data-v="false">לא</button>
+        <button type="button" data-v="true">כן</button>
+      </div>
+      <input type="text" id="painkiller_note" placeholder="אם כן — מה, מתי, וכמה עזר">
+    </div>
+
+    <div class="field">
+      <span class="label">יישום תפריט התזונאית היום</span>
+      <div class="seg" id="diet_adherence">
+        <button type="button" data-v="מלא">מלא</button>
+        <button type="button" data-v="חלקי">חלקי</button>
+        <button type="button" data-v="חריגה">חריגה</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- DETAIL -->
+  <details>
+    <summary>פירוט נוסף · אופציונלי <span class="caret">▾</span></summary>
+    <div class="details-body">
+      <div class="field">
+        <div class="lab-row"><span class="label">נפיחות בטן ("endo belly")</span><span class="val small" id="v_bloat">0 / 3</span></div>
+        <input type="range" min="0" max="3" step="1" id="gi_bloating" value="0" data-out="v_bloat" data-suffix=" / 3">
+      </div>
+      <div class="field">
+        <div class="lab-row"><span class="label">כאב ביציאה</span><span class="val small" id="v_bm">0 / 3</span></div>
+        <input type="range" min="0" max="3" step="1" id="gi_bm_pain" value="0" data-out="v_bm" data-suffix=" / 3">
+      </div>
+      <label class="field">
+        <span class="label">יציאות היום</span>
+        <select id="gi_stool">
+          <option value="">—</option>
+          <option>לא הייתה</option>
+          <option>רגיל</option>
+          <option>עצירות / קשה</option>
+          <option>שלשול / רך</option>
+        </select>
+      </label>
+      <div class="field">
+        <div class="lab-row"><span class="label">כאב ביחסי מין — עמוק</span><span class="val small" id="v_dysp">—</span></div>
+        <input type="range" min="0" max="10" step="1" id="dyspareunia_deep" value="0" data-out="v_dysp" data-suffix=" / 10" data-optional>
+        <div class="ends"><span>השאירי ריק אם לא היה</span><span></span></div>
+      </div>
+      <label class="field">
+        <span class="label">פעילות גופנית היום</span>
+        <input type="text" id="activity" placeholder="סוג ומשך">
+      </label>
+      <div class="field">
+        <span class="label">קרה משהו חריג היום?</span>
+        <div class="chips" data-multi id="context_flags">
+          <span class="chip" role="button" aria-pressed="false">מחלה / חום</span>
+          <span class="chip" role="button" aria-pressed="false">נסיעה</span>
+          <span class="chip" role="button" aria-pressed="false">אירוע מתח משמעותי</span>
+          <span class="chip" role="button" aria-pressed="false">שינוי תרופה / תוסף</span>
+          <span class="chip" role="button" aria-pressed="false">מאמץ גופני חריג</span>
+        </div>
+      </div>
+      <label class="field">
+        <span class="label">הערה חופשית</span>
+        <textarea id="note" placeholder="כל דבר שהנתונים לא יודעים עליו"></textarea>
+      </label>
+    </div>
+  </details>
+
+  <button class="save" id="saveBtn">שמירת היום</button>
+  <div class="hint">הליבה מספיקה לניתוח. הפירוט משפר דיוק אבל לא חובה.</div>
+  <div id="toast" class="toast" hidden></div>
+
+</div>
+
+<script>
+const SUPABASE_URL = "https://wdlemmrdafvypbzgfvkx.supabase.co";
+const SUPABASE_KEY = "sb_publishable_MeP8AVZnlEMWZCW29lsnvw_urLdPl_P";
+const TABLE = "daily_log";
+const DRAFT_KEY = "endo_draft";
+const QUEUE_KEY = "endo_queue";
+
+const $ = s => document.querySelector(s);
+const todayISO = () => { const d=new Date(); d.setMinutes(d.getMinutes()-d.getTimezoneOffset()); return d.toISOString().slice(0,10); };
+
+// ---- date + day name
+const heDay = ['ראשון','שני','שלישי','רביעי','חמישי','שישי','שבת'];
+const heMon = ['ינואר','פברואר','מרץ','אפריל','מאי','יוני','יולי','אוגוסט','ספטמבר','אוקטובר','נובמבר','דצמבר'];
+$('#entry_date').value = todayISO();
+function refreshDayName(){
+  const d = new Date($('#entry_date').value + 'T12:00');
+  $('#dayName').textContent = isNaN(d) ? '' : `יום ${heDay[d.getDay()]}, ${d.getDate()} ב${heMon[d.getMonth()]}`;
+}
+$('#entry_date').addEventListener('change', ()=>{ refreshDayName(); loadDraft(); });
+refreshDayName();
+
+// ---- range outputs
+document.querySelectorAll('input[type=range]').forEach(r=>{
+  const out = $('#'+r.dataset.out);
+  const sfx = r.dataset.suffix || '';
+  const touched = new Set();
+  const upd = ()=> { out.textContent = (r.dataset.optional && !touched.has(r)) ? '—' : (r.value + sfx); };
+  r.addEventListener('input', ()=>{ touched.add(r); r._touched = true; upd(); saveDraft(); });
+  r._reset = ()=>{ touched.delete(r); r._touched=false; upd(); };
+  upd();
+});
+
+// ---- chips (multi)
+document.querySelectorAll('.chips[data-multi] .chip').forEach(c=>{
+  c.addEventListener('click', ()=>{ c.setAttribute('aria-pressed', c.getAttribute('aria-pressed')==='true'?'false':'true'); saveDraft(); });
+});
+// ---- segmented
+document.querySelectorAll('.seg').forEach(seg=>{
+  seg.querySelectorAll('button').forEach(b=>{
+    b.addEventListener('click', ()=>{
+      seg.querySelectorAll('button').forEach(x=>x.setAttribute('aria-pressed','false'));
+      b.setAttribute('aria-pressed','true'); saveDraft();
+    });
+  });
+});
+// ---- dots
+$('#sleep_quality').querySelectorAll('span').forEach(s=>{
+  s.addEventListener('click', ()=>{
+    const v = +s.dataset.v;
+    $('#sleep_quality').querySelectorAll('span').forEach(x=> x.dataset.on = (+x.dataset.v<=v)?'1':'0');
+    $('#sleep_quality').dataset.value = v; saveDraft();
+  });
+});
+// ---- stepper
+document.querySelectorAll('.stepper button').forEach(b=>{
+  b.addEventListener('click', ()=>{
+    const inp = $('#'+b.dataset.target);
+    let v = Math.max(0, Math.min(16, (+inp.value) + (+b.dataset.step)));
+    inp.value = v; $('#'+b.dataset.target+'_n').textContent = v.toFixed(1); saveDraft();
+  });
+});
+['painkiller_note','activity','note','gi_stool','phase'].forEach(id=> $('#'+id).addEventListener('input', saveDraft));
+
+// ---- collect / apply
+function getChips(id){ return [...$('#'+id).querySelectorAll('.chip[aria-pressed="true"]')].map(c=>c.textContent.trim()).join(', ') || null; }
+function getSeg(id){ const b = $('#'+id).querySelector('button[aria-pressed="true"]'); return b ? b.dataset.v : null; }
+
+function collect(){
+  const pk = getSeg('painkiller');
+  const dyspR = $('#dyspareunia_deep');
+  return {
+    entry_date: $('#entry_date').value,
+    phase: $('#phase').value,
+    pain_pelvic: +$('#pain_pelvic').value,
+    pain_location: getChips('pain_location'),
+    pain_character: getChips('pain_character'),
+    uterine_cramp: +$('#uterine_cramp').value,
+    fatigue: +$('#fatigue').value,
+    mood: +$('#mood').value,
+    stress: +$('#stress').value,
+    sleep_hours: +$('#sleep_hours').value,
+    sleep_quality: $('#sleep_quality').dataset.value ? +$('#sleep_quality').dataset.value : null,
+    bleeding: getSeg('bleeding'),
+    painkiller: pk===null ? null : (pk==='true'),
+    painkiller_note: $('#painkiller_note').value.trim() || null,
+    diet_adherence: getSeg('diet_adherence'),
+    gi_bloating: $('#gi_bloating')._touched ? +$('#gi_bloating').value : null,
+    gi_bm_pain: $('#gi_bm_pain')._touched ? +$('#gi_bm_pain').value : null,
+    gi_stool: $('#gi_stool').value || null,
+    dyspareunia_deep: dyspR._touched ? +dyspR.value : null,
+    activity: $('#activity').value.trim() || null,
+    context_flags: getChips('context_flags'),
+    note: $('#note').value.trim() || null,
+    source: 'web_form'
+  };
+}
+
+// ---- draft (per date)
+function saveDraft(){
+  try{
+    const all = JSON.parse(localStorage.getItem(DRAFT_KEY) || '{}');
+    all[$('#entry_date').value] = collect();
+    localStorage.setItem(DRAFT_KEY, JSON.stringify(all));
+  }catch(e){}
+}
+function loadDraft(){
+  let d;
+  try{ d = (JSON.parse(localStorage.getItem(DRAFT_KEY)||'{}'))[$('#entry_date').value]; }catch(e){}
+  resetForm();
+  if(!d) return;
+  $('#phase').value = d.phase || 'A';
+  const setR = (id,v,touch)=>{ const r=$('#'+id); if(v!=null){ r.value=v; if(touch){r._touched=true;} } r.dispatchEvent(new Event('input')); if(!touch) r._touched=false; };
+  setR('pain_pelvic', d.pain_pelvic); setR('uterine_cramp', d.uterine_cramp);
+  setR('fatigue', d.fatigue); setR('mood', d.mood); setR('stress', d.stress);
+  setR('gi_bloating', d.gi_bloating, d.gi_bloating!=null); setR('gi_bm_pain', d.gi_bm_pain, d.gi_bm_pain!=null);
+  setR('dyspareunia_deep', d.dyspareunia_deep, d.dyspareunia_deep!=null);
+  if(d.sleep_hours!=null){ $('#sleep_hours').value=d.sleep_hours; $('#sleep_hours_n').textContent=(+d.sleep_hours).toFixed(1); }
+  applyChips('pain_location', d.pain_location); applyChips('pain_character', d.pain_character); applyChips('context_flags', d.context_flags);
+  applySeg('bleeding', d.bleeding); applySeg('diet_adherence', d.diet_adherence);
+  applySeg('painkiller', d.painkiller==null?null:String(d.painkiller));
+  if(d.sleep_quality){ const ev=new Event('click'); $('#sleep_quality span[data-v="'+d.sleep_quality+'"]').dispatchEvent(ev); }
+  $('#painkiller_note').value = d.painkiller_note||''; $('#activity').value = d.activity||'';
+  $('#note').value = d.note||''; $('#gi_stool').value = d.gi_stool||'';
+}
+function applyChips(id,str){ if(!str) return; const set=new Set(str.split(',').map(s=>s.trim())); $('#'+id).querySelectorAll('.chip').forEach(c=> c.setAttribute('aria-pressed', set.has(c.textContent.trim())?'true':'false')); }
+function applySeg(id,v){ if(v==null) return; const b=$('#'+id+' button[data-v="'+v+'"]'); if(b){ $('#'+id).querySelectorAll('button').forEach(x=>x.setAttribute('aria-pressed','false')); b.setAttribute('aria-pressed','true'); } }
+function resetForm(){
+  document.querySelectorAll('input[type=range]').forEach(r=>{ r.value=r.min; r._touched=false; if(r._reset)r._reset(); r.dispatchEvent(new Event('input')); r._touched=false; });
+  document.querySelectorAll('.chip').forEach(c=>c.setAttribute('aria-pressed','false'));
+  document.querySelectorAll('.seg button').forEach(b=>b.setAttribute('aria-pressed','false'));
+  $('#sleep_hours').value=7; $('#sleep_hours_n').textContent='7.0';
+  $('#sleep_quality').removeAttribute('data-value'); $('#sleep_quality').querySelectorAll('span').forEach(x=>x.dataset.on='0');
+  $('#painkiller_note').value=''; $('#activity').value=''; $('#note').value=''; $('#gi_stool').value='';
+}
+
+// ---- submit
+function showToast(msg, ok){
+  const t=$('#toast'); t.hidden=false; t.className='toast '+(ok?'ok':'err'); t.textContent=msg;
+  if(ok) setTimeout(()=>{ t.hidden=true; }, 4000);
+}
+async function postRow(row){
+  const res = await fetch(`${SUPABASE_URL}/rest/v1/${TABLE}`, {
+    method:'POST',
+    headers:{
+      'apikey': SUPABASE_KEY,
+      'Authorization': 'Bearer '+SUPABASE_KEY,
+      'Content-Type':'application/json',
+      'Prefer':'return=minimal'
+    },
+    body: JSON.stringify(row)
+  });
+  if(!res.ok) throw new Error('HTTP '+res.status+' '+(await res.text()).slice(0,200));
+}
+function queueGet(){ try{ return JSON.parse(localStorage.getItem(QUEUE_KEY)||'[]'); }catch(e){ return []; } }
+function queueSet(a){ localStorage.setItem(QUEUE_KEY, JSON.stringify(a)); renderQueue(); }
+function renderQueue(){
+  const q=queueGet(); const box=$('#queueBox');
+  if(q.length){ box.hidden=false; $('#queueMsg').textContent = `${q.length} רשומות ממתינות לשליחה`; }
+  else box.hidden=true;
+}
+async function flushQueue(){
+  let q=queueGet(); const keep=[];
+  for(const row of q){ try{ await postRow(row); }catch(e){ keep.push(row); } }
+  queueSet(keep);
+  return keep.length;
+}
+$('#retryBtn').addEventListener('click', async ()=>{
+  $('#retryBtn').disabled=true;
+  const left = await flushQueue();
+  $('#retryBtn').disabled=false;
+  showToast(left ? `נותרו ${left} רשומות` : 'כל הרשומות נשלחו ✓', left===0);
+});
+
+$('#saveBtn').addEventListener('click', async ()=>{
+  const row = collect();
+  $('#saveBtn').disabled=true; $('#saveBtn').textContent='שומר…';
+  try{
+    await flushQueue();
+    await postRow(row);
+    showToast('נשמר ✓  ' + row.entry_date, true);
+    try{ const all=JSON.parse(localStorage.getItem(DRAFT_KEY)||'{}'); delete all[row.entry_date]; localStorage.setItem(DRAFT_KEY, JSON.stringify(all)); }catch(e){}
+    resetForm();
+  }catch(e){
+    const q=queueGet(); q.push(row); queueSet(q);
+    showToast('אין חיבור — נשמר מקומית וישלח אוטומטית', false);
+  }
+  $('#saveBtn').disabled=false; $('#saveBtn').textContent='שמירת היום';
+});
+
+window.addEventListener('online', flushQueue);
+loadDraft();
+renderQueue();
+flushQueue();
+</script>
+</body>
+</html>

@@ -1,0 +1,18 @@
+{
+  "name": "יומן אנדו",
+  "short_name": "יומן אנדו",
+  "start_url": ".",
+  "display": "standalone",
+  "background_color": "#f5f2ec",
+  "theme_color": "#a9573c",
+  "lang": "he",
+  "dir": "rtl",
+  "icons": [
+    {
+      "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'%3E%3Crect width='192' height='192' rx='40' fill='%23a9573c'/%3E%3Ctext x='96' y='128' font-size='96' text-anchor='middle' fill='%23fff' font-family='sans-serif'%3E%D7%99%3C/text%3E%3C/svg%3E",
+      "sizes": "192x192",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}
