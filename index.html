@@ -316,6 +316,7 @@ const SUPABASE_KEY = "sb_publishable_MeP8AVZnlEMWZCW29lsnvw_urLdPl_P";
 const TABLE = "daily_log";
 const DRAFT_KEY = "endo_draft";
 const QUEUE_KEY = "endo_queue";
+const PHASE_KEY = "endo_phase";
 
 const $ = s => document.querySelector(s);
 const todayISO = () => { const d=new Date(); d.setMinutes(d.getMinutes()-d.getTimezoneOffset()); return d.toISOString().slice(0,10); };
@@ -380,6 +381,8 @@ document.querySelectorAll('.stepper button').forEach(b=>{
   });
 });
 ['painkiller_note','activity','note','gi_stool','phase'].forEach(id=> $('#'+id).addEventListener('input', saveDraft));
+try{ $('#phase').value = localStorage.getItem(PHASE_KEY) || 'A'; }catch(e){}
+$('#phase').addEventListener('change', ()=>{ try{ localStorage.setItem(PHASE_KEY, $('#phase').value); }catch(e){} haptic(10); });
 
 // ---- collect / apply
 function getChips(id){ return [...$('#'+id).querySelectorAll('.chip[aria-pressed="true"]')].map(c=>c.textContent.trim()).join(', ') || null; }
@@ -427,8 +430,9 @@ function loadDraft(){
   let d;
   try{ d = (JSON.parse(localStorage.getItem(DRAFT_KEY)||'{}'))[$('#entry_date').value]; }catch(e){}
   resetForm();
+  try{ $('#phase').value = localStorage.getItem(PHASE_KEY) || 'A'; }catch(e){}
   if(!d) return;
-  $('#phase').value = d.phase || 'A';
+  $('#phase').value = d.phase || localStorage.getItem(PHASE_KEY) || 'A';
   const setR = (id,v,touch)=>{ const r=$('#'+id); if(v!=null){ r.value=v; if(touch){r._touched=true;} } r.dispatchEvent(new Event('input')); if(!touch) r._touched=false; };
   setR('pain_pelvic', d.pain_pelvic); setR('uterine_cramp', d.uterine_cramp);
   setR('fatigue', d.fatigue); setR('mood', d.mood); setR('stress', d.stress);
